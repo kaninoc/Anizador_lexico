@@ -1,0 +1,16 @@
+    s = cadena.find("//")
+    print(s)
+    if s != -1:
+        return True
+    f = cadena.find("/*")
+    if f != -1:
+        coment = True
+        return True
+    f = cadena.find("*/")
+    if coment == True:
+        return True
+    if f != -1:
+        coment = False
+        return True
+    if f == -1:
+        return False
