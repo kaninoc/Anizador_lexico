@@ -44,7 +44,9 @@ reservadas = [
     "cadena",
     "entero",
     "falso",
-    "verdadero"
+    "verdadero",
+    "leer", 
+    "imprimir"
 ]
 
 funcion_defecto = ["leer", "imprimir"]
@@ -176,6 +178,7 @@ def analizador(lista, linea):
     for elemento in lista:
         if validar_reservada(elemento[0]):
             print('<'+elemento[0]+','+str(linea)+','+str(elemento[1])+'>')
+        
 
 def validar_reservada(elemento):
     try:
@@ -183,6 +186,7 @@ def validar_reservada(elemento):
         return True
     except ValueError:
         return False
+
 
 # procedimiento principal
 
