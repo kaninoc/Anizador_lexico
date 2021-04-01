@@ -150,7 +150,7 @@ while True:
     try:
         cadena = input()
 
-        if idcomentarios(cadena) == False:
+        if idcomentarios(cadena) == False and cadena !="":
             listpalabra, pospalabras = separarLinea(cadena)
             analizador(listpalabra, pospalabras,linea)
         linea += 1

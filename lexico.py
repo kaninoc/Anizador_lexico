@@ -45,36 +45,56 @@ reservadas = [
     "entero",
     "falso",
     "verdadero",
-    "leer", 
-    "imprimir"
+    "leer",
+    "imprimir",
+    "funcion",
+    "retornar",
+    "fin_funcion",
+    "mientras",
+    "hacer",
+    "para",
+    "fin_mientras",
+    "fin_para",
+    "seleccionar",
+    "entre",
+    "caso",
+    "romper",
+    "defecto",
+    "fin_seleccionar",
+    "si", 
+    "si_no", 
+    "fin_si",
+    "entonces", 
+    "estructura", 
+    "fin_estructura"
 ]
 
-funcion_defecto = ["leer", "imprimir"]
-
+'''
 condicionales = ["si", "si_no", "fin_si"]
 
 ciclos = ["mientras", "hacer", "para", "fin_mientras", "fin_para"]
 
 case = ["seleccionar", "entre", "caso", "romper", "defecto", "fin_seleccionar"]
 
-estructuras = ["estructura", "fin_estructura"]
-
-funcion = ["funcion", "retornar", "fin_funcion"]
-
-# print(simbolos[20]+"  "+tokens[20])
+estructuras = ["estructura", "fin_estructura"]'''
 
 
 class Token:
-    fila = ''
+    simbolo = ''
+    id = ''
     columna = ''
-    lexema = ''
-    tipo = ''
+    fila = ''
 
-    def print_information(self, fila, columna, lexema, tipo):
-        print(self.fila)
-        print(self.columna)
-        print(self.lexema)
-        print(self.tipo)
+    def print_reservada(self):
+        print('<'+self.simbolo+','+str(self.fila)+','+str(self.columna)+'>')
+
+    def print_numero(self):
+        print('<'+self.simbolo+','+self.id+',' +
+              str(self.fila)+','+str(self.columna)+'>')
+
+    def print_error(self):
+        print('>>> Error lexico (linea: '+str(self.fila) +
+              ', posicion: '+str(self.columna)+')')
 
 
 t = Token()
@@ -119,6 +139,7 @@ def idcomentarios(cadena):
 
 
 def separarLinea(cadena):
+    ##print(cadena)
     resultados = []
     palabraVar = ['', -1]
     simbolo = ['', -1]
@@ -127,10 +148,7 @@ def separarLinea(cadena):
         if letra == ' ':
             # print("hola")
             if palabraVar[0] != '':
-                if palabraVar[0].isnumeric():
-                    resultados.append([int(palabraVar[0]), palabraVar[1]])
-                else:
-                    resultados.append([palabraVar[0], palabraVar[1]])
+                resultados.append([palabraVar[0], palabraVar[1]])
                 palabraVar = ['', -1]
             if simbolo[0] != '':
                 resultados.append([simbolo[0], simbolo[1]])
@@ -148,24 +166,17 @@ def separarLinea(cadena):
                     resultados.append([simbolo[0], simbolo[1]])
                     simbolo = ['', -1]
                 if i+1 == len(cadena):
-                    if palabraVar[0].isnumeric():
-                        print(palabraVar[0].isnumeric())
-                        resultados.append([int(palabraVar[0]), palabraVar[1]])
-                    else:
-                        resultados.append([palabraVar[0], palabraVar[1]])
+                    resultados.append([palabraVar[0], palabraVar[1]])
 
             verificar_simbolo = simboloValido.match(letra)  # simbolo valido
             # print(bool(verificar_simbolo))
+
             if bool(verificar_simbolo):
                 simbolo[0] = simbolo[0] + letra
                 if simbolo[1] == -1:
                     simbolo[1] = i+1
                 if palabraVar[0] != '':
-                    # print("hola")
-                    if palabraVar[0].isnumeric():
-                        resultados.append([int(palabraVar[0]), palabraVar[1]])
-                    else:
-                        resultados.append([palabraVar[0], palabraVar[1]])
+                    resultados.append([palabraVar[0], palabraVar[1]])
                     palabraVar = ['', -1]
                 if i+1 == len(cadena):
                     resultados.append([simbolo[0], simbolo[1]])
@@ -175,10 +186,56 @@ def separarLinea(cadena):
 
 # imprime y aniza coincidencias
 def analizador(lista, linea):
-    for elemento in lista:
+    ##print(lista)
+    for i, elemento in enumerate(lista):
+        if elemento[0] == '\r':
+            ##print("fiesta")
+            break
+        if validar_tabulacion(elemento[0]):
+            lista[i+1][1] = lista[i+1][1]+3
+            continue
         if validar_reservada(elemento[0]):
-            print('<'+elemento[0]+','+str(linea)+','+str(elemento[1])+'>')
-        
+            t = Token()
+            t.simbolo = elemento[0]
+            t.fila = str(linea)
+            t.columna = str(elemento[1])
+            t.print_reservada()
+        if validar_simbolo(elemento[0]) != -1:
+            n = validar_simbolo(elemento[0])
+            t = Token()
+            t.simbolo = tokens[n]
+            t.fila = str(linea)
+            t.columna = str(elemento[1])
+            t.print_reservada()
+        if id_numero(elemento[0]) != "no":
+            t = Token()
+            t.simbolo = id_numero(elemento[0])
+            t.id = elemento[0]
+            t.fila = str(linea)
+            t.columna = str(elemento[1])
+            t.print_numero()
+        if validar_variable(elemento[0]):
+            t = Token()
+            t.simbolo = "id"
+            t.id = elemento[0]
+            t.fila = str(linea)
+            t.columna = str(elemento[1])
+            t.print_numero()
+        if validar_variable(elemento[0]) == False:
+            t = Token()
+            t.fila = str(linea)
+            t.columna = str(elemento[1])
+            t.print_error()
+            return False
+            break
+
+    return True
+
+
+def validar_tabulacion(elemento):
+    if elemento == '\t':
+        return True
+
 
 def validar_reservada(elemento):
     try:
@@ -188,17 +245,46 @@ def validar_reservada(elemento):
         return False
 
 
+def validar_simbolo(elemento):
+    try:
+        n = simbolos.index(elemento)
+        return n
+    except ValueError:
+        return -1
+
+
+def id_numero(elemento):
+    if elemento.isnumeric():
+        return "tk_entero"
+    if elemento.isdecimal():
+        return "tk_real"
+    return "no"
+
+
+def validar_variable(elemento):
+    # print(validar_reservada(elemento),validar_simbolo(elemento),id_numero(elemento))
+    if elemento.find("ñ") != -1 or elemento.find("Ñ") != -1:
+        return False
+    if validar_reservada(elemento) == False and validar_simbolo(elemento) == -1 and id_numero(elemento) == "no":
+        return True
+
+
 # procedimiento principal
 
 while True:
 
     try:
         cadena = input()
-
-        if idcomentarios(cadena) == False:
+        if cadena.find('\r'):
+            # print(cadena)
+            cadena = cadena.replace('\\r', '')
+        if idcomentarios(cadena) == False and cadena != "":
             lineas_analizadas = separarLinea(cadena)
-            # print(lineas_analizadas)
-            analizador(lineas_analizadas, linea)
+            # print("entro")
+            b = analizador(lineas_analizadas, linea)
+            ##print (b)
+            if b == False:
+                break
         linea += 1
     except EOFError:
         break
