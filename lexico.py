@@ -61,11 +61,11 @@ reservadas = [
     "romper",
     "defecto",
     "fin_seleccionar",
-    "si", 
-    "si_no", 
+    "si",
+    "si_no",
     "fin_si",
-    "entonces", 
-    "estructura", 
+    "entonces",
+    "estructura",
     "fin_estructura"
 ]
 
@@ -139,10 +139,11 @@ def idcomentarios(cadena):
 
 
 def separarLinea(cadena):
-    ##print(cadena)
+    # print(cadena)
     resultados = []
     palabraVar = ['', -1]
     simbolo = ['', -1]
+    punto = False
 
     for i, letra in enumerate(cadena):
         if letra == ' ':
@@ -172,10 +173,19 @@ def separarLinea(cadena):
             # print(bool(verificar_simbolo))
 
             if bool(verificar_simbolo):
+                if letra == '.':
+                    if id_numero(palabraVar[0]) == "tk_entero" and punto == False:
+                        punto = True
+                        palabraVar[0] = palabraVar[0] + letra
+                        continue
+                    else:
+                        punto = False
+
                 simbolo[0] = simbolo[0] + letra
                 if simbolo[1] == -1:
                     simbolo[1] = i+1
                 if palabraVar[0] != '':
+
                     resultados.append([palabraVar[0], palabraVar[1]])
                     palabraVar = ['', -1]
                 if i+1 == len(cadena):
@@ -183,23 +193,26 @@ def separarLinea(cadena):
 
     return resultados
 
+# elimina los saltos de linea
+
+
 def eliminar(lista):
     aux = []
     for i, elemento in enumerate(lista):
-        if elemento[0].find('\r')!=-1:
+        if elemento[0].find('\r') != -1:
             s = elemento[0]
             s = s[:len(s)-1]
-            aux.append([s,elemento[1]])
+            aux.append([s, elemento[1]])
         else:
             aux.append(elemento)
     return aux
 
+
 # imprime y aniza coincidencias
 def analizador(lista, linea):
-    ##print(lista)
+    # print(lista)
     for i, elemento in enumerate(lista):
         if elemento[0] == '\r' or elemento[0] == '':
-            ##print("fiesta")
             break
         if elemento[0].find('\r')!=-1:
             e = elemento[0].replace('\\r', '')
@@ -269,7 +282,7 @@ def validar_simbolo(elemento):
 def id_numero(elemento):
     if elemento.isnumeric():
         return "tk_entero"
-    if elemento.isdecimal():
+    if elemento.find(".") != -1 and elemento != '.':
         return "tk_real"
     return "no"
 
