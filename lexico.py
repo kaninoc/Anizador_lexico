@@ -183,14 +183,27 @@ def separarLinea(cadena):
 
     return resultados
 
+def eliminar(lista):
+    aux = []
+    for i, elemento in enumerate(lista):
+        if elemento[0].find('\r')!=-1:
+            s = elemento[0]
+            s = s[:len(s)-1]
+            aux.append([s,elemento[1]])
+        else:
+            aux.append(elemento)
+    return aux
 
 # imprime y aniza coincidencias
 def analizador(lista, linea):
     ##print(lista)
     for i, elemento in enumerate(lista):
-        if elemento[0] == '\r':
+        if elemento[0] == '\r' or elemento[0] == '':
             ##print("fiesta")
             break
+        if elemento[0].find('\r')!=-1:
+            e = elemento[0].replace('\\r', '')
+            print(e)
         if validar_tabulacion(elemento[0]):
             lista[i+1][1] = lista[i+1][1]+3
             continue
@@ -275,13 +288,13 @@ while True:
 
     try:
         cadena = input()
-        if cadena.find('\r'):
+        '''if cadena.find('\r')!=-1:
             # print(cadena)
-            cadena = cadena.replace('\\r', '')
+            cadena = cadena.replace('\\r', '')'''
         if idcomentarios(cadena) == False and cadena != "":
             lineas_analizadas = separarLinea(cadena)
-            # print("entro")
-            b = analizador(lineas_analizadas, linea)
+            lineas_finales = eliminar(lineas_analizadas)
+            b = analizador(lineas_finales, linea)
             ##print (b)
             if b == False:
                 break
