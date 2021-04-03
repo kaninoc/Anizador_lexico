@@ -188,6 +188,22 @@ def separarLinea(cadena):
                         resultados.append([strings[0]+'"', strings[1]])
                         strings = ['', -1, False]
                         continue
+
+                if letra == '(' or letra == ')':
+                    if palabraVar[0] != '':
+                        resultados.append([palabraVar[0], palabraVar[1]])
+                        resultados.append([letra, i+1])
+                        palabraVar = ['', -1]
+                        continue
+                    if simbolo[0] != '':
+                        resultados.append([simbolo[0], simbolo[1]])
+                        resultados.append([letra, i+1])
+                        simbolo = ['', -1]
+                        continue
+                    else:
+                        resultados.append([letra, i+1])
+                        continue
+
                 if strings[2] == True:
                     strings = [strings[0] + letra, strings[1], True]
                     continue
@@ -201,6 +217,7 @@ def separarLinea(cadena):
                     palabraVar = ['', -1]
                 if i+1 == len(cadena):
                     resultados.append([simbolo[0], simbolo[1]])
+                    simbolo = ['', -1]
 
     return resultados
 
@@ -228,7 +245,7 @@ def analizador(lista, linea):
         if validar_tabulacion(elemento[0]):
             lista[i+1][1] = lista[i+1][1]+3
             continue
-        if validar_cadena_var(elemento[0])!="no":
+        if validar_cadena_var(elemento[0]) != "no":
             t = Token()
             t.simbolo = validar_cadena_var(elemento[0])
             t.id = elemento[0]
