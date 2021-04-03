@@ -144,10 +144,14 @@ def separarLinea(cadena):
     palabraVar = ['', -1]
     simbolo = ['', -1]
     punto = False
+    strings = ['', -1, False]
 
     for i, letra in enumerate(cadena):
         if letra == ' ':
             # print("hola")
+            if strings[2] == True:
+                strings = [strings[0] + letra, strings[1], True]
+                continue
             if palabraVar[0] != '':
                 resultados.append([palabraVar[0], palabraVar[1]])
                 palabraVar = ['', -1]
@@ -159,6 +163,9 @@ def separarLinea(cadena):
             verificar_letra = letraValida.match(letra)  # Letra o numero valido
             # print(bool(verificar_letra))
             if bool(verificar_letra):
+                if strings[2] == True:
+                    strings = [strings[0] + letra, strings[1], True]
+                    continue
                 # print(bool(verificar_letra))
                 palabraVar[0] = palabraVar[0] + letra
                 if palabraVar[1] == -1:
@@ -180,6 +187,18 @@ def separarLinea(cadena):
                         continue
                     else:
                         punto = False
+                if letra == '"':
+                    print("reconoce")
+                    if strings[2] == False:
+                        strings = [strings[0] + letra, i+1, True]
+                        continue
+                    else:
+                        resultados.append([strings[0]+'"', strings[1]])
+                        strings = ['', -1, False]
+                        continue
+                if strings[2] == True:
+                    strings = [strings[0] + letra, strings[1], True]
+                    continue
 
                 simbolo[0] = simbolo[0] + letra
                 if simbolo[1] == -1:
@@ -214,7 +233,7 @@ def analizador(lista, linea):
     for i, elemento in enumerate(lista):
         if elemento[0] == '\r' or elemento[0] == '':
             break
-        if elemento[0].find('\r')!=-1:
+        if elemento[0].find('\r') != -1:
             e = elemento[0].replace('\\r', '')
             print(e)
         if validar_tabulacion(elemento[0]):
