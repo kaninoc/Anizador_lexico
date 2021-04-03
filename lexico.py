@@ -6,6 +6,9 @@ simboloValido = re.compile('\W')
 
 comentarios = ["//", "/*", "*/"]
 
+nopermitidos = ['ñ', 'Ñ', 'á', 'Á', 'é', 'É', 'í',
+                'Í', 'ó', 'Ó', 'ú', 'Ú', '@', '{', '}', '[', ']']
+
 simbolos = ['+', '-', '*', '/', '%', '=', '<', '>', '<=', '>=',
             '==', '&&', '||', '!=', '!', ':', ';', ',', '.', '(', ')']
 tokens = [
@@ -139,6 +142,18 @@ def separarLinea(cadena):
     strings = ['', -1, False]
 
     for i, letra in enumerate(cadena):
+
+        if validar_especiales(letra):
+            if palabraVar[0] != '':
+                resultados.append([palabraVar[0], palabraVar[1]])
+                palabraVar = ['', -1]
+            if simbolo[0] != '':
+                resultados.append([palabraVar[0], palabraVar[1]])
+                simbolo = ['', -1]
+            resultados.append([letra, i+1])
+
+            continue
+
         if letra == ' ':
             # print("hola")
             if strings[2] == True:
@@ -189,7 +204,7 @@ def separarLinea(cadena):
                         strings = ['', -1, False]
                         continue
 
-                if letra == '(' or letra == ')':
+                if letra == '(' or letra == ')' or letra == '+' or letra == '-' or letra == '*' or letra == '/' or letra == '%' or letra == ':' or letra == ';' or letra == ',' or letra == '.':
                     if palabraVar[0] != '':
                         resultados.append([palabraVar[0], palabraVar[1]])
                         resultados.append([letra, i+1])
@@ -245,6 +260,20 @@ def analizador(lista, linea):
         if validar_tabulacion(elemento[0]):
             lista[i+1][1] = lista[i+1][1]+3
             continue
+        if validar_especiales(elemento[0]) == True:
+            t = Token()
+            t.fila = str(linea)
+            t.columna = str(elemento[1])
+            t.print_error()
+            return False
+            break
+        if validar_variable(elemento[0]):
+            t = Token()
+            t.simbolo = "id"
+            t.id = elemento[0]
+            t.fila = str(linea)
+            t.columna = str(elemento[1])
+            t.print_numero()
         if validar_cadena_var(elemento[0]) != "no":
             t = Token()
             t.simbolo = validar_cadena_var(elemento[0])
@@ -273,22 +302,17 @@ def analizador(lista, linea):
             t.fila = str(linea)
             t.columna = str(elemento[1])
             t.print_numero()
-        if validar_variable(elemento[0]):
-            t = Token()
-            t.simbolo = "id"
-            t.id = elemento[0]
-            t.fila = str(linea)
-            t.columna = str(elemento[1])
-            t.print_numero()
-        if validar_variable(elemento[0]) == False:
-            t = Token()
-            t.fila = str(linea)
-            t.columna = str(elemento[1])
-            t.print_error()
-            return False
-            break
 
     return True
+
+
+def validar_variable(elemento):
+
+    if elemento[0] == '"' or elemento[0] == "'":
+        return False
+
+    if validar_reservada(elemento) == False and validar_simbolo(elemento) == -1 and id_numero(elemento) == "no":
+        return True
 
 
 def validar_tabulacion(elemento):
@@ -299,6 +323,14 @@ def validar_tabulacion(elemento):
 def validar_reservada(elemento):
     try:
         n = reservadas.index(elemento)
+        return True
+    except ValueError:
+        return False
+
+
+def validar_especiales(elemento):
+    try:
+        n = nopermitidos.index(elemento)
         return True
     except ValueError:
         return False
@@ -326,16 +358,8 @@ def validar_cadena_var(elemento):
     else:
         return "no"
 
-
-def validar_variable(elemento):
-    # print(validar_reservada(elemento),validar_simbolo(elemento),id_numero(elemento))
-    if elemento.find("ñ") != -1 or elemento.find("Ñ") != -1:
-        return False
-    if validar_reservada(elemento) == False and validar_simbolo(elemento) == -1 and id_numero(elemento) == "no":
-        return True
-
-
 # procedimiento principal
+
 
 while True:
 
