@@ -18,5 +18,6 @@ print(a[:len(a)-1]+"hola")
 print(a+"hola")
 
 my_str='python string'
+my_str.reverse
 final_str=my_str[:-1]
 print(final_str)

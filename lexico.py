@@ -97,14 +97,6 @@ class Token:
               ', posicion: '+str(self.columna)+')')
 
 
-t = Token()
-t.columna = 0
-t.fila = 1
-t.lexema = '+'
-# t.tipo = "entero"
-# t.print_information(t.fila, t.columna, t.lexema, t.tipo)
-
-
 # variables de fila y columna del analizador Globales
 
 linea = 1
@@ -188,7 +180,6 @@ def separarLinea(cadena):
                     else:
                         punto = False
                 if letra == '"':
-                    print("reconoce")
                     if strings[2] == False:
                         strings = [strings[0] + letra, i+1, True]
                         continue
@@ -233,11 +224,16 @@ def analizador(lista, linea):
     for i, elemento in enumerate(lista):
         if elemento[0] == '\r' or elemento[0] == '':
             break
-        if elemento[0].find('\r') != -1:
-            e = elemento[0].replace('\\r', '')
-            print(e)
         if validar_tabulacion(elemento[0]):
             lista[i+1][1] = lista[i+1][1]+3
+            continue
+        if validar_cadena_var(elemento[0])!="no":
+            t = Token()
+            t.simbolo = validar_cadena_var(elemento[0])
+            t.id = elemento[0]
+            t.fila = str(linea)
+            t.columna = str(elemento[1])
+            t.print_numero()
             continue
         if validar_reservada(elemento[0]):
             t = Token()
@@ -304,6 +300,13 @@ def id_numero(elemento):
     if elemento.find(".") != -1 and elemento != '.':
         return "tk_real"
     return "no"
+
+
+def validar_cadena_var(elemento):
+    if elemento[0] == '"' and elemento[len(elemento[0])-2] == '"':
+        return "tk_cadena"
+    else:
+        return "no"
 
 
 def validar_variable(elemento):
