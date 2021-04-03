@@ -147,6 +147,7 @@ def separarLinea(cadena):
             if palabraVar[0] != '':
                 resultados.append([palabraVar[0], palabraVar[1]])
                 palabraVar = ['', -1]
+                punto = False
             if simbolo[0] != '':
                 resultados.append([simbolo[0], simbolo[1]])
                 simbolo = ['', -1]
