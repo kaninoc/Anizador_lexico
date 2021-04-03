@@ -140,8 +140,24 @@ def separarLinea(cadena):
     simbolo = ['', -1]
     punto = False
     strings = ['', -1, False]
+    char = ['', -1, False]
 
     for i, letra in enumerate(cadena):
+
+        if ord(letra) == 39:
+            if char[2] == False:
+                if palabraVar[0] != '':
+                    resultados.append([palabraVar[0], palabraVar[1]])
+                    palabraVar = ['', -1]
+                if simbolo[0] != '':
+                    resultados.append([palabraVar[0], palabraVar[1]])
+                    simbolo = ['', -1]
+                char = [letra, i+1, True]
+                continue
+            if char[2] == True:
+                resultados.append([char[0]+letra, char[1]])
+                char = ['', -1, False]
+                continue
 
         if validar_especiales(letra):
             if palabraVar[0] != '':
@@ -159,6 +175,9 @@ def separarLinea(cadena):
             if strings[2] == True:
                 strings = [strings[0] + letra, strings[1], True]
                 continue
+            if char[2] == True:
+                char = [char[0] + letra, char[1], True]
+                continue
             if palabraVar[0] != '':
                 resultados.append([palabraVar[0], palabraVar[1]])
                 palabraVar = ['', -1]
@@ -174,6 +193,9 @@ def separarLinea(cadena):
                 if strings[2] == True:
                     strings = [strings[0] + letra, strings[1], True]
                     continue
+                if char[2] == True:
+                    char = [char[0] + letra, char[1], True]
+                    continue
                 # print(bool(verificar_letra))
                 palabraVar[0] = palabraVar[0] + letra
                 if palabraVar[1] == -1:
@@ -188,6 +210,9 @@ def separarLinea(cadena):
             # print(bool(verificar_simbolo))
 
             if bool(verificar_simbolo):
+                if char[2] == True:
+                    char = [char[0] + letra, char[1], True]
+                    continue
                 if letra == '.':
                     if id_numero(palabraVar[0]) == "tk_entero" and punto == False:
                         punto = True
@@ -253,7 +278,7 @@ def eliminar(lista):
 
 # imprime y aniza coincidencias
 def analizador(lista, linea):
-    # print(lista)
+    ##print(lista)
     for i, elemento in enumerate(lista):
         if elemento[0] == '\r' or elemento[0] == '':
             break
@@ -278,6 +303,14 @@ def analizador(lista, linea):
             t = Token()
             t.simbolo = validar_cadena_var(elemento[0])
             t.id = elemento[0]
+            t.fila = str(linea)
+            t.columna = str(elemento[1])
+            t.print_numero()
+            continue
+        if validar_caracter(elemento[0]) != "error":
+            t = Token()
+            t.simbolo = validar_caracter(elemento[0])
+            t.id = elemento[0][1:2]
             t.fila = str(linea)
             t.columna = str(elemento[1])
             t.print_numero()
@@ -308,7 +341,7 @@ def analizador(lista, linea):
 
 def validar_variable(elemento):
 
-    if elemento[0] == '"' or elemento[0] == "'":
+    if elemento[0] == '"' or ord(elemento[0]) == 39:
         return False
 
     if validar_reservada(elemento) == False and validar_simbolo(elemento) == -1 and id_numero(elemento) == "no":
@@ -350,6 +383,13 @@ def id_numero(elemento):
     if elemento.find(".") != -1 and elemento != '.':
         return "tk_real"
     return "no"
+
+
+def validar_caracter(elemento):
+    if ord(elemento[0]) == 39 and ord(elemento[len(elemento[0])-2]) == 39:
+        return "tk_caracter"
+    else:
+        return "error"
 
 
 def validar_cadena_var(elemento):
