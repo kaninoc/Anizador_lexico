@@ -2,6 +2,7 @@
 import re
 letraValida = re.compile('\w')
 simboloValido = re.compile('\W')
+digitoValido = re.compile('\d')
 # Contiene los tokens y simbolos necesarios para el analizador lexico
 
 comentarios = ["//", "/*", "*/"]
@@ -134,7 +135,7 @@ def idcomentarios(cadena):
 
 
 def separarLinea(cadena):
-    # print(cadena)
+    ##print(cadena)
     resultados = []
     palabraVar = ['', -1]
     simbolo = ['', -1]
@@ -275,6 +276,38 @@ def eliminar(lista):
             aux.append(elemento)
     return aux
 
+def separador(lista):
+    aux = []
+    for i, elemento in enumerate(lista):
+        number = ['', -1]
+        palabra = ['', -1]
+        for j, letra in enumerate(elemento[0]):
+            if bool(digitoValido.match(letra)) == False and j == 0:
+                aux.append(elemento)
+                break
+            if letra == '.' or ord(letra) == 39:
+                aux.append(elemento)
+                break
+            if bool(digitoValido.match(letra)):
+                if palabra[0] != '':
+                    aux.append([palabra[0], palabra[1]])
+                    palabra = ['', -1]
+                if number[1] == -1:
+                    number[1] = elemento[1]+j
+                number[0] = number[0] + letra
+            if bool(digitoValido.match(letra)) == False:
+                if number[0] != '':
+                    aux.append([number[0], number[1]])
+                    number = ['', -1]
+                if palabra[1] == -1:
+                    palabra[1] = elemento[1]+j
+                palabra[0] = palabra[0] + letra
+            if len(elemento[0]) == j+1:
+                if number[0] != '':
+                    aux.append(number)
+                else:
+                    aux.append(palabra)
+    return aux
 
 # imprime y aniza coincidencias
 def analizador(lista, linea):
@@ -283,7 +316,6 @@ def analizador(lista, linea):
         if elemento[0] == '\r' or elemento[0] == '':
             break
         if validar_tabulacion(elemento[0]):
-            lista[i+1][1] = lista[i+1][1]+3
             continue
         if validar_especiales(elemento[0]) == True:
             t = Token()
@@ -310,7 +342,7 @@ def analizador(lista, linea):
         if validar_caracter(elemento[0]) != "error":
             t = Token()
             t.simbolo = validar_caracter(elemento[0])
-            t.id = elemento[0][1:2]
+            t.id = elemento[0]
             t.fila = str(linea)
             t.columna = str(elemento[1])
             t.print_numero()
@@ -411,6 +443,7 @@ while True:
         if idcomentarios(cadena) == False and cadena != "":
             lineas_analizadas = separarLinea(cadena)
             lineas_finales = eliminar(lineas_analizadas)
+            lineas_finales =separador(lineas_finales)
             b = analizador(lineas_finales, linea)
             ##print (b)
             if b == False:
