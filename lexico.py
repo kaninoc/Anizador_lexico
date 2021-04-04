@@ -310,7 +310,7 @@ def analizador(lista, linea):
         if validar_caracter(elemento[0]) != "error":
             t = Token()
             t.simbolo = validar_caracter(elemento[0])
-            t.id = elemento[0][1:2]
+            t.id = elemento[0]
             t.fila = str(linea)
             t.columna = str(elemento[1])
             t.print_numero()
