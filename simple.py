@@ -1,6 +1,7 @@
 import re
 digitoValido = re.compile('\d')
 
+
 ##lista = [["barsalitsuni", 1], ["desto21", 2], ["123anomalias", 3], ["14", 4]]
 lista = [["1+==1", 3], ["ñ123", 16]]
 aux = []
@@ -31,3 +32,4 @@ for i, elemento in enumerate(lista):
             else:
                 aux.append(palabra)
 print(aux)
+
