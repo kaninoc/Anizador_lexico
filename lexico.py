@@ -135,7 +135,7 @@ def idcomentarios(cadena):
 
 
 def separarLinea(cadena):
-    ##print(cadena)
+    # print(cadena)
     resultados = []
     palabraVar = ['', -1]
     simbolo = ['', -1]
@@ -316,6 +316,7 @@ def analizador(lista, linea):
         if elemento[0] == '\r' or elemento[0] == '':
             break
         if validar_tabulacion(elemento[0]):
+            ##lista[i+1][1] = lista[i+1][1]+3
             continue
         if validar_especiales(elemento[0]) == True:
             t = Token()
